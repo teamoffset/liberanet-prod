@@ -445,7 +445,8 @@ Para gerar seu PIX, envie seus dados no formato:
                     ]
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
-Use o botão abaixo para acompanhar seu pagamento
+                
+                payment_text = f"""Use o botão abaixo para acompanhar seu pagamento
 
 💡 **Após o pagamento:**
 Seu acesso será liberado automaticamente!

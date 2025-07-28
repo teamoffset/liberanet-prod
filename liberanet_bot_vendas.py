@@ -1,35 +1,18 @@
 #!/usr/bin/env python3
 """
-LiberaNet Bot - Sales Focused Version with PushInPay Integration
-Professional Mobile Platform for Brazilian Market
+LiberaNet Bot - Interactive Sales Version with Buttons
+Professional Mobile Platform for Brazilian Market with Enhanced UX
 """
 
 import logging
 import os
 import asyncio
 import subprocess
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
-        keyboard = [
-            [
-                InlineKeyboardButton("💰 Comprar Premium", callback_data='comprar'),
-                InlineKeyboardButton("💳 Pagar PIX", callback_data='pagar')
-            ],
-            [
-                InlineKeyboardButton("🆓 Demo Grátis", callback_data='demo'),
-                InlineKeyboardButton("💬 Suporte", callback_data='suporte')
-            ],
-            [
-                InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
-            ]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        await update.message.reply_text(functionality_message, parse_mode='Markdown', reply_markup=reply_markup)utton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, MenuButton, MenuButtonCommands
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 import json
 from datetime import datetime
-from pushinpay_integration import pushinpay
+from pushinpay_integration import pushinpay, format_pix_for_copy_paste
 from config import TELEGRAM_BOT_TOKEN, PROMO_PRICE
 
 # Configure logging
@@ -39,21 +22,31 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-class LiberaNetSalesBot:
+class LiberaNetInteractiveBot:
     def __init__(self, token):
         self.token = token
         self.app = Application.builder().token(token).build()
         self.pending_payments = {}  # Store pending payments
         self.setup_handlers()
+        self.setup_menu_button()
+        
+    async def setup_menu_button(self):
+        """Setup persistent menu button in chat"""
+        try:
+            menu_button = MenuButtonCommands()
+            await self.app.bot.set_chat_menu_button(menu_button=menu_button)
+            logger.info("Menu button configured successfully")
+        except Exception as e:
+            logger.error(f"Error setting up menu button: {e}")
         
     def setup_handlers(self):
         """Setup all command and message handlers"""
         self.app.add_handler(CommandHandler("start", self.start))
-        self.app.add_handler(CommandHandler("funcionalidades", self.analise))
+        self.app.add_handler(CommandHandler("funcionalidades", self.funcionalidades))
         self.app.add_handler(CommandHandler("comprar", self.comprar))
         self.app.add_handler(CommandHandler("pagar", self.process_payment))
-        self.app.add_handler(CommandHandler("demo", self.teste))
-        self.app.add_handler(CommandHandler("suporte", self.ajuda))
+        self.app.add_handler(CommandHandler("demo", self.demo))
+        self.app.add_handler(CommandHandler("suporte", self.suporte))
         self.app.add_handler(CommandHandler("planos", self.planos))
         self.app.add_handler(CommandHandler("contato", self.contato))
         self.app.add_handler(CommandHandler("status", self.check_payment_status))
@@ -62,7 +55,7 @@ class LiberaNetSalesBot:
         self.app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
     
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Start command handler"""
+        """Start command handler with interactive buttons"""
         welcome_message = """
 💰 **LIBERANET - PLATAFORMA MOBILE PREMIUM** 💎
 ════════════════════════════════════════════
@@ -71,9 +64,9 @@ class LiberaNetSalesBot:
 
 💸 **FUNCIONALIDADES EXCLUSIVAS:**
 • 🔧 **FERRAMENTAS** avançadas de desenvolvimento
-• � **MODIFICAÇÃO** de aplicativos Android
+• 📱 **MODIFICAÇÃO** de aplicativos Android
 • 💎 **PERSONALIZAÇÃO** completa de APKs
-• �️ **ENGENHARIA** reversa profissional
+• 🛠️ **ENGENHARIA** reversa profissional
 • 🔓 **DESBLOQUEIO** de recursos premium
 • 📊 **DASHBOARD** administrativo completo
 
@@ -86,12 +79,7 @@ class LiberaNetSalesBot:
 • Comunidade exclusiva
 • Tutoriais avançados
 
-🔥 **COMANDOS:**
-• `/funcionalidades` - VER TODAS AS FERRAMENTAS
-• `/comprar` - ADQUIRIR ACESSO
-• `/pagar` - PAGAMENTO VIA PIX (INSTANTÂNEO)
-• `/demo` - DEMONSTRAÇÃO GRATUITA
-• `/suporte` - AJUDA TÉCNICA
+🔥 **PROMO ESPECIAL:** Primeiro mês R$ 12,50!
 
 💎 **COMO FUNCIONA:**
 1. 📱 ASSINE O PLANO PREMIUM
@@ -120,15 +108,27 @@ class LiberaNetSalesBot:
             ],
             [
                 InlineKeyboardButton("📞 Contato", callback_data='contato'),
-                InlineKeyboardButton("📈 Status Pagamentos", callback_data='status')
+                InlineKeyboardButton("📈 Status Pagamento", callback_data='status')
             ]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+        # Check if this is a callback query or regular message
+        if hasattr(update, 'callback_query') and update.callback_query:
+            await update.callback_query.edit_message_text(
+                welcome_message, 
+                parse_mode='Markdown', 
+                reply_markup=reply_markup
+            )
+        else:
+            await update.message.reply_text(
+                welcome_message, 
+                parse_mode='Markdown', 
+                reply_markup=reply_markup
+            )
 
     async def comprar(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Purchase plans command"""
+        """Purchase plans command with buttons"""
         purchase_message = """
 💰 **ADQUIRA SEU ACESSO PREMIUM AGORA!** 💎
 ═══════════════════════════════════════
@@ -150,9 +150,9 @@ class LiberaNetSalesBot:
 • 🔓 Desbloqueador de recursos premium
 • 📊 Painel de controle profissional
 
-� **OFERTA ESPECIAL:**
-💥 **PRIMEIRO MÊS POR APENAS R$ 12,50!**
-💥 **SEM TAXA DE SETUP!**
+💥 **OFERTA ESPECIAL:**
+💰 **PRIMEIRO MÊS POR APENAS R$ 12,50!**
+💰 **SEM TAXA DE SETUP!**
 
 📞 **CONTATO PARA COMPRA:**
 💬 WhatsApp: +55 11 99999-9999
@@ -173,15 +173,15 @@ class LiberaNetSalesBot:
                 InlineKeyboardButton("💬 Suporte", callback_data='suporte')
             ],
             [
-                InlineKeyboardButton("🏠 Menu Inicial", callback_data='start')
+                InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
             ]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await update.message.reply_text(purchase_message, parse_mode='Markdown', reply_markup=reply_markup)
+        await self.reply_with_buttons(update, purchase_message, reply_markup)
 
-    async def teste(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Demo command"""
+    async def demo(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Demo command with buttons"""
         demo_message = """
 🆓 **DEMONSTRAÇÃO GRATUITA LIBERANET!** 🎯
 ═══════════════════════════════════════
@@ -208,7 +208,7 @@ Assine por apenas R$ 25/mês e tenha
 acesso completo a tudo que viu!
 
 **AGENDE SUA DEMO AGORA!**
-Entre em contato: `/suporte`
+Entre em contato através dos botões abaixo!
 """
         
         # Add demo action buttons
@@ -227,15 +227,15 @@ Entre em contato: `/suporte`
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await update.message.reply_text(demo_message, parse_mode='Markdown', reply_markup=reply_markup)
+        await self.reply_with_buttons(update, demo_message, reply_markup)
 
-    async def planos(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Show functionality details"""
+    async def funcionalidades(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Show functionality details with buttons"""
         functionality_message = """
-� **TODAS AS FUNCIONALIDADES LIBERANET** �
+🛠️ **TODAS AS FUNCIONALIDADES LIBERANET** 💎
 ══════════════════════════════════════════
 
-🛠️ **FERRAMENTAS PRINCIPAIS:**
+🔧 **FERRAMENTAS PRINCIPAIS:**
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ 📱 MODIFICADOR DE APK                       ┃
 ┃ • Alterar textos e imagens                  ┃
@@ -244,7 +244,7 @@ Entre em contato: `/suporte`
 ┃ • Personalizar interfaces                   ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-🔧 **ENGENHARIA REVERSA:**
+💎 **ENGENHARIA REVERSA:**
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ 🔍 Decompilador avançado                    ┃
 ┃ 🛠️ Editor de código                         ┃
@@ -260,13 +260,34 @@ Entre em contato: `/suporte`
 ┃ 📁 Gerenciador de projetos                 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-� **TUDO POR APENAS R$ 25/MÊS!**
+✅ **TUDO POR APENAS R$ 25/MÊS!**
 **ACESSO COMPLETO A TODAS AS FERRAMENTAS!**
 """
-        await update.message.reply_text(functionality_message, parse_mode='Markdown')
+        
+        # Add action buttons to functionalities
+        keyboard = [
+            [
+                InlineKeyboardButton("💰 Comprar Premium", callback_data='comprar'),
+                InlineKeyboardButton("💳 Pagar PIX", callback_data='pagar')
+            ],
+            [
+                InlineKeyboardButton("🆓 Demo Grátis", callback_data='demo'),
+                InlineKeyboardButton("💬 Suporte", callback_data='suporte')
+            ],
+            [
+                InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await self.reply_with_buttons(update, functionality_message, reply_markup)
+
+    async def planos(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Alias for funcionalidades"""
+        await self.funcionalidades(update, context)
 
     async def contato(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Contact information"""
+        """Contact information with buttons"""
         contact_message = """
 📞 **SUPORTE TÉCNICO LIBERANET** 💬
 ═══════════════════════════════
@@ -275,163 +296,71 @@ Entre em contato: `/suporte`
 • 📱 WhatsApp: +55 11 99999-9999
 • 📧 Email: suporte@liberanet.com.br
 • 🌐 Site: www.liberanet.com.br
+• 💬 Telegram: @LiberaNetSupport
 
-⚡ **SUPORTE ESPECIALIZADO:**
-• 💬 Chat ao vivo no site
-• 🛠️ Ajuda com ferramentas
-• � Tutoriais personalizados
-• 🔧 Suporte técnico avançado
-
-🕐 **HORÁRIO DE ATENDIMENTO:**
-• Segunda a Sexta: 8h às 18h
-• Sábado: 8h às 12h
+⏰ **HORÁRIO DE ATENDIMENTO:**
+• Segunda a Sexta: 9h às 18h
+• Sábado: 9h às 14h
 • Domingo: Emergências apenas
 
-🎯 **DÚVIDAS TÉCNICAS:**
-Nossa equipe especializada está pronta
-para ajudar com qualquer ferramenta!
+🚀 **TIPOS DE SUPORTE:**
+• ✅ Instalação e configuração
+• ✅ Dúvidas técnicas
+• ✅ Problemas com pagamento
+• ✅ Solicitação de funcionalidades
+• ✅ Treinamento personalizado
 
-**ESTAMOS AQUI PARA VOCÊ!**
+**ESTAMOS AQUI PARA AJUDAR!**
 """
-        await update.message.reply_text(contact_message, parse_mode='Markdown')
-
-    async def analise(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Show functionality details"""
-        functionality_message = """
-� **FUNCIONALIDADES PRINCIPAIS** 💎
-═══════════════════════════════════
-
-📱 **MODIFICADOR DE APK:**
-• Alterar textos e imagens nos apps
-• Remover anúncios completamente
-• Desbloquear recursos premium
-• Personalizar interfaces
-• Injetar novos recursos
-
-🛠️ **ENGENHARIA REVERSA:**
-• Decompilador avançado de APKs
-• Editor de código integrado
-• Bypass de proteções
-• Extração de recursos
-• Análise de estrutura
-
-📊 **DASHBOARD ADMINISTRATIVO:**
-• Painel de controle completo
-• Histórico de modificações
-• Gerenciador de projetos
-• Estatísticas em tempo real
-
-💰 **ACESSO COMPLETO POR R$ 25/MÊS!**
-
-**QUER VER AS FERRAMENTAS EM AÇÃO?**
-Use `/demo` para demonstração!
-"""
-        await update.message.reply_text(functionality_message, parse_mode='Markdown')
-
-    async def ajuda(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Help command handler"""
-        help_message = """
-📚 **CENTRAL DE SUPORTE LIBERANET** 🎯
-════════════════════════════════════
-
-🔥 **COMANDOS PRINCIPAIS:**
-• `/start` - Mensagem de boas-vindas
-• `/funcionalidades` - Ver todas as ferramentas
-• `/comprar` - Adquirir acesso premium
-• `/demo` - Demonstração gratuita
-• `/suporte` - Ajuda técnica
-
-📱 **COMO USAR A PLATAFORMA:**
-1. Assine o plano premium (R$ 25/mês)
-2. Acesse o dashboard administrativo
-3. Use todas as ferramentas disponíveis
-
-🎯 **DÚVIDAS FREQUENTES:**
-• Modificação de APKs suportada
-• Dashboard web intuitivo
-• Suporte técnico incluído
-• Atualizações constantes
-
-💬 **PRECISA DE MAIS AJUDA?**
-Entre em contato: `/suporte`
-
-**NOSSA EQUIPE ESTÁ PRONTA!**
-"""
-        await update.message.reply_text(help_message, parse_mode='Markdown')
-
-    async def handle_apk_file(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handle APK file uploads"""
         
-        apk_message = """
-� **APK RECEBIDO!** 🔧
-═════════════════════
+        keyboard = [
+            [
+                InlineKeyboardButton("💰 Comprar Premium", callback_data='comprar'),
+                InlineKeyboardButton("🆓 Demo Grátis", callback_data='demo')
+            ],
+            [
+                InlineKeyboardButton("💳 Pagar PIX", callback_data='pagar'),
+                InlineKeyboardButton("📈 Status Pagamento", callback_data='status')
+            ],
+            [
+                InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await self.reply_with_buttons(update, contact_message, reply_markup)
 
-Vejo que você enviou um arquivo APK!
-
-💎 **PARA MODIFICAR ESTE APK:**
-1. Assine o LIBERANET PREMIUM (R$ 25/mês)
-2. Acesse o dashboard administrativo
-3. Use nossas ferramentas profissionais
-
-🛠️ **O QUE VOCÊ PODE FAZER:**
-• Remover anúncios completamente
-• Desbloquear recursos premium  
-• Personalizar interface
-• Injetar novos recursos
-• Modificar textos e imagens
-
-� **ACESSO COMPLETO POR APENAS R$ 25/MÊS!**
-
-🚀 **COMANDOS ÚTEIS:**
-• `/funcionalidades` - Ver todas as ferramentas
-• `/comprar` - Adquirir acesso
-• `/demo` - Demonstração gratuita
-
-**TRANSFORME SEUS APKs AGORA!**
-"""
-        await update.message.reply_text(apk_message, parse_mode='Markdown')
-
-    async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handle text messages"""
-        sales_message = """
-💬 **INTERESSADO NA PLATAFORMA?** 💰
-═══════════════════════════════════
-
-Vejo que você quer saber mais sobre o LIBERANET!
-
-🎯 **PERFEITO PARA:**
-• 👨‍💻 Desenvolvedores mobile
-• 🔧 Modificadores de apps
-• � Criadores de conteúdo
-• �️ Engenheiros de software
-
-� **ACESSO PREMIUM:**
-Apenas R$ 25/mês para todas as ferramentas!
-
-� **COMANDOS ÚTEIS:**
-• `/funcionalidades` - Ver ferramentas
-• `/comprar` - Adquirir acesso
-• `/demo` - Demonstração gratuita
-
-**COMECE AGORA MESMO!**
-"""
-        await update.message.reply_text(sales_message, parse_mode='Markdown')
+    async def suporte(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Alias for contato"""
+        await self.contato(update, context)
 
     async def process_payment(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Process PIX payment"""
+        """Process PIX payment with enhanced UX"""
         user_id = update.effective_user.id
         user_name = update.effective_user.full_name or "Cliente"
         
         # Check if user has pending payment
         if user_id in self.pending_payments:
-            await update.message.reply_text(
+            keyboard = [
+                [
+                    InlineKeyboardButton("📈 Verificar Status", callback_data='status'),
+                    InlineKeyboardButton("💬 Suporte", callback_data='suporte')
+                ],
+                [
+                    InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+                ]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await self.reply_with_buttons(
+                update,
                 "🚫 **Você já tem um pagamento pendente!**\n\n"
-                "Use `/status` para verificar o status do seu pagamento.",
-                parse_mode='Markdown'
+                "Use o botão 'Verificar Status' para acompanhar seu pagamento.",
+                reply_markup
             )
             return
         
-        # Ask for customer info
+        # Ask for customer info if not provided
         if not context.args:
             info_message = """
 📋 **DADOS PARA PAGAMENTO PIX** 💳
@@ -449,37 +378,42 @@ Para gerar seu PIX, envie seus dados no formato:
 
 **Envie seus dados agora!**
 """
-            await update.message.reply_text(info_message, parse_mode='Markdown')
+            
+            keyboard = [
+                [
+                    InlineKeyboardButton("💬 Preciso de Ajuda", callback_data='suporte'),
+                    InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+                ]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await self.reply_with_buttons(update, info_message, reply_markup)
             return
-        
+
         if len(context.args) < 2:
-            await update.message.reply_text(
-                "❌ **Dados incompletos!**\n\n"
-                "Use: `/pagar SEU_EMAIL SEU_TELEFONE`",
-                parse_mode='Markdown'
-            )
+            error_message = "❌ **Dados incompletos!**\n\nUse: `/pagar SEU_EMAIL SEU_TELEFONE`"
+            keyboard = [
+                [
+                    InlineKeyboardButton("💬 Preciso de Ajuda", callback_data='suporte'),
+                    InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+                ]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await self.reply_with_buttons(update, error_message, reply_markup)
             return
-        
+
         customer_email = context.args[0]
         customer_phone = context.args[1]
-        
-        # Validate email format (basic)
-        if "@" not in customer_email or "." not in customer_email:
-            await update.message.reply_text(
-                "❌ **Email inválido!**\n\n"
-                "Use um email válido como: joao@email.com",
-                parse_mode='Markdown'
-            )
-            return
-        
-        # Generate PIX payment
+
+        # Show processing message
         processing_msg = await update.message.reply_text(
-            "⏳ **Gerando seu PIX...** 💳\n\n"
-            "Aguarde alguns segundos...",
+            "⏳ **Gerando PIX...** 💳\n\nAguarde alguns segundos...",
             parse_mode='Markdown'
         )
-        
+
         try:
+            # Create PIX payment
             payment_result = pushinpay.create_pix_payment(
                 amount=PROMO_PRICE,  # First month promo price
                 customer_name=user_name,
@@ -498,38 +432,26 @@ Para gerar seu PIX, envie seus dados no formato:
                     'phone': customer_phone
                 }
                 
-                success_message = f"""
-                # Generate a proper PIX copy-paste code
-                pix_copy_paste = payment_result.get('pix_code', '00020126580014BR.GOV.BCB.PIX0136123e4567-e12b-12d1-a456-426655440000520400005303986540512.505802BR5925LIBERANET DESENVOLVIMENTO6009SAO PAULO610805049000622905251234567890123456789063041234')
+                # Format PIX using the new copy-paste format
+                pix_message = format_pix_for_copy_paste(payment_result, PROMO_PRICE)
                 
-                success_message = f"""
-✅ **PIX GERADO COM SUCESSO!** 💎
-════════════════════════════════
-
-💰 **Valor:** R$ 12,50
-👤 **Cliente:** {user_name}
-📧 **Email:** {customer_email}
-⏰ **Expira em:** 15 minutos
-
-📱 **PIX COPIA E COLA:**
-```
-{pix_copy_paste}
-```
-
-📋 **INSTRUÇÕES:**
-1. **COPIE** o código PIX acima
-2. **ABRA** seu banco ou app de pagamento
-3. **ESCOLHA** PIX → Pix Copia e Cola
-4. **COLE** o código e confirme R$ 12,50
-
-🔍 **Verificar Status:**
-Use o botão abaixo para acompanhar
+                keyboard = [
+                    [
+                        InlineKeyboardButton("📈 Verificar Status", callback_data='status'),
+                        InlineKeyboardButton("💬 Suporte Urgente", callback_data='suporte')
+                    ],
+                    [
+                        InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+                    ]
+                ]
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                
+                payment_text = f"""Use o botão abaixo para acompanhar seu pagamento
 
 💡 **Após o pagamento:**
 Seu acesso será liberado automaticamente!
 
-**COPIE O PIX E PAGUE AGORA!**
-"""
+**PAGUE AGORA E COMECE A USAR!**
 """
                 
                 # Add payment action buttons
@@ -548,110 +470,208 @@ Seu acesso será liberado automaticamente!
                 await processing_msg.edit_text(success_message, parse_mode='Markdown', reply_markup=reply_markup)
                 
             else:
-                await processing_msg.edit_text(
-                    "❌ **Erro ao gerar PIX!**\n\n"
-                    "Tente novamente em alguns minutos ou "
-                    "entre em contato: `/suporte`",
-                    parse_mode='Markdown'
-                )
+                error_message = """
+❌ **Erro ao gerar PIX!**
+
+Não foi possível processar sua solicitação.
+Tente novamente em alguns minutos.
+
+**Se o problema persistir, entre em contato conosco!**
+"""
+                keyboard = [
+                    [
+                        InlineKeyboardButton("🔄 Tentar Novamente", callback_data='pagar'),
+                        InlineKeyboardButton("💬 Suporte", callback_data='suporte')
+                    ],
+                    [
+                        InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+                    ]
+                ]
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                
+                await processing_msg.edit_text(error_message, parse_mode='Markdown', reply_markup=reply_markup)
                 
         except Exception as e:
             logger.error(f"Payment processing error: {e}")
-            await processing_msg.edit_text(
-                "❌ **Erro no processamento!**\n\n"
-                "Nossa equipe foi notificada. "
-                "Tente novamente ou use `/suporte`",
-                parse_mode='Markdown'
-            )
-    
+            error_message = f"""
+❌ **Erro no processamento!**
+
+Ocorreu um erro técnico: {str(e)}
+Entre em contato com nosso suporte.
+
+**Estamos aqui para ajudar!**
+"""
+            keyboard = [
+                [
+                    InlineKeyboardButton("💬 Contatar Suporte", callback_data='suporte'),
+                    InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+                ]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await processing_msg.edit_text(error_message, parse_mode='Markdown', reply_markup=reply_markup)
+
     async def check_payment_status(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Check payment status"""
+        """Check payment status with buttons"""
         user_id = update.effective_user.id
         
         if user_id not in self.pending_payments:
-            await update.message.reply_text(
-                "ℹ️ **Nenhum pagamento pendente encontrado.**\n\n"
-                "Use `/pagar` para gerar um novo PIX.",
-                parse_mode='Markdown'
-            )
+            no_payment_message = """
+❌ **Nenhum pagamento pendente encontrado!**
+
+Você não possui pagamentos em andamento.
+Gere um novo PIX para continuar.
+"""
+            keyboard = [
+                [
+                    InlineKeyboardButton("💳 Gerar PIX", callback_data='pagar'),
+                    InlineKeyboardButton("💰 Ver Planos", callback_data='comprar')
+                ],
+                [
+                    InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+                ]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await self.reply_with_buttons(update, no_payment_message, reply_markup)
             return
-        
+
         payment_info = self.pending_payments[user_id]
         
         try:
-            status_result = pushinpay.check_payment_status(payment_info['payment_id'])
+            # Check payment status
+            status = pushinpay.check_payment_status(payment_info['payment_id'])
             
-            if status_result:
-                status = status_result.get('status', 'unknown')
-                
-                if status == 'paid':
-                    # Payment confirmed!
-                    del self.pending_payments[user_id]
+            if status:
+                if status.get('status') == 'paid':
+                    # Payment confirmed
+                    del self.pending_payments[user_id]  # Remove from pending
                     
-                    success_message = """
+                    success_message = f"""
 🎉 **PAGAMENTO CONFIRMADO!** ✅
-═══════════════════════════════
 
-💰 **Valor:** R$ 12,50
-✅ **Status:** PAGO
-🎯 **Seu acesso Premium foi ativado!**
+💰 **Valor:** R$ {payment_info['amount']:.2f}
+🎯 **Status:** Pago e confirmado
+⏰ **Data:** {datetime.now().strftime('%d/%m/%Y às %H:%M')}
 
-🚀 **PRÓXIMOS PASSOS:**
-1. Acesse: www.liberanet.com.br/dashboard
-2. Use seu email para login: {email}
-3. Comece a usar todas as ferramentas!
+🚀 **SEU ACESSO FOI LIBERADO!**
 
-🔧 **COMANDOS ÚTEIS:**
-• `/funcionalidades` - Ver todas as ferramentas
-• `/suporte` - Suporte técnico
-• `/demo` - Demonstração das funcionalidades
+Agora você tem acesso completo à plataforma LiberaNet Premium!
 
-**BEM-VINDO AO LIBERANET PREMIUM!** 🎊
-""".format(email=payment_info['email'])
+💎 **Próximos passos:**
+1. Acesse o dashboard administrativo
+2. Explore todas as ferramentas
+3. Comece seus projetos
+
+**BEM-VINDO AO LIBERANET PREMIUM!**
+"""
+                    keyboard = [
+                        [
+                            InlineKeyboardButton("🔧 Ver Funcionalidades", callback_data='funcionalidades'),
+                            InlineKeyboardButton("💬 Suporte", callback_data='suporte')
+                        ],
+                        [
+                            InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+                        ]
+                    ]
+                    reply_markup = InlineKeyboardMarkup(keyboard)
                     
-                    await update.message.reply_text(success_message, parse_mode='Markdown')
+                    await self.reply_with_buttons(update, success_message, reply_markup)
                     
-                elif status == 'expired':
-                    del self.pending_payments[user_id]
-                    await update.message.reply_text(
-                        "⏰ **PIX Expirado!**\n\n"
-                        "Gere um novo PIX com `/pagar`",
-                        parse_mode='Markdown'
-                    )
+                elif status.get('status') == 'expired':
+                    # Payment expired
+                    del self.pending_payments[user_id]  # Remove from pending
                     
-                elif status == 'cancelled':
-                    del self.pending_payments[user_id]
-                    await update.message.reply_text(
-                        "❌ **Pagamento Cancelado**\n\n"
-                        "Gere um novo PIX com `/pagar`",
-                        parse_mode='Markdown'
-                    )
+                    expired_message = """
+⏰ **Pagamento Expirado** ❌
+
+Seu PIX expirou após 15 minutos.
+Gere um novo PIX para continuar.
+
+**Não se preocupe, é rápido e fácil!**
+"""
+                    keyboard = [
+                        [
+                            InlineKeyboardButton("💳 Gerar Novo PIX", callback_data='pagar'),
+                            InlineKeyboardButton("💬 Suporte", callback_data='suporte')
+                        ],
+                        [
+                            InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+                        ]
+                    ]
+                    reply_markup = InlineKeyboardMarkup(keyboard)
+                    
+                    await self.reply_with_buttons(update, expired_message, reply_markup)
                     
                 else:
+                    # Payment still pending
                     minutes_ago = int((datetime.now() - payment_info['created_at']).total_seconds() / 60)
-                    await update.message.reply_text(
-                        f"⏳ **Aguardando Pagamento** 💳\n\n"
-                        f"💰 **Valor:** R$ {payment_info['amount']:.2f}\n"
-                        f"⏰ **Gerado há:** {minutes_ago} minutos\n"
-                        f"🔍 **Status:** Pendente\n\n"
-                        f"O PIX expira em 15 minutos após a geração.\n"
-                        f"Use `/status` para verificar novamente.",
-                        parse_mode='Markdown'
-                    )
+                    pending_message = f"""
+⏳ **Aguardando Pagamento** 💳
+
+💰 **Valor:** R$ {payment_info['amount']:.2f}
+⏰ **Gerado há:** {minutes_ago} minutos
+🔍 **Status:** Aguardando pagamento
+
+O PIX expira em 15 minutos após a geração.
+Efetue o pagamento para liberar seu acesso!
+
+**Pague agora e comece a usar!**
+"""
+                    keyboard = [
+                        [
+                            InlineKeyboardButton("🔄 Verificar Novamente", callback_data='status'),
+                            InlineKeyboardButton("💬 Suporte", callback_data='suporte')
+                        ],
+                        [
+                            InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+                        ]
+                    ]
+                    reply_markup = InlineKeyboardMarkup(keyboard)
+                    
+                    await self.reply_with_buttons(update, pending_message, reply_markup)
             else:
-                await update.message.reply_text(
-                    "❌ **Erro ao verificar status!**\n\n"
-                    "Tente novamente em alguns segundos.",
-                    parse_mode='Markdown'
-                )
+                # Error checking status
+                error_message = """
+❌ **Erro ao verificar status!**
+
+Não foi possível verificar o status do pagamento.
+Tente novamente em alguns segundos.
+
+**Se o problema persistir, entre em contato!**
+"""
+                keyboard = [
+                    [
+                        InlineKeyboardButton("🔄 Tentar Novamente", callback_data='status'),
+                        InlineKeyboardButton("💬 Suporte", callback_data='suporte')
+                    ],
+                    [
+                        InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+                    ]
+                ]
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                
+                await self.reply_with_buttons(update, error_message, reply_markup)
                 
         except Exception as e:
             logger.error(f"Status check error: {e}")
-            await update.message.reply_text(
-                "❌ **Erro na verificação!**\n\n"
-                "Tente novamente ou use `/suporte`",
-                parse_mode='Markdown'
-            )
+            technical_error_message = f"""
+❌ **Erro técnico na verificação!**
+
+Ocorreu um erro: {str(e)}
+Entre em contato com nosso suporte técnico.
+
+**Estamos aqui para resolver!**
+"""
+            keyboard = [
+                [
+                    InlineKeyboardButton("💬 Contatar Suporte", callback_data='suporte'),
+                    InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+                ]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await self.reply_with_buttons(update, technical_error_message, reply_markup)
 
     async def button_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle button callbacks"""
@@ -663,23 +683,28 @@ Seu acesso será liberado automaticamente!
         # Create a new update object for callbacks
         callback_update = Update(
             update_id=update.update_id,
-            message=query.message
+            callback_query=query
         )
         
         if callback_data == 'start':
             await self.start(callback_update, context)
         elif callback_data == 'funcionalidades':
-            await self.planos(callback_update, context)
+            await self.funcionalidades(callback_update, context)
         elif callback_data == 'comprar':
             await self.comprar(callback_update, context)
         elif callback_data == 'demo':
-            await self.teste(callback_update, context)
+            await self.demo(callback_update, context)
         elif callback_data == 'pagar':
-            await self.process_payment(callback_update, context)
+            await query.edit_message_text(
+                "💳 **Para gerar PIX, use o comando:**\n\n"
+                "`/pagar SEU_EMAIL SEU_TELEFONE`\n\n"
+                "**Exemplo:** `/pagar joao@email.com 11999887766`",
+                parse_mode='Markdown'
+            )
         elif callback_data == 'planos':
             await self.planos(callback_update, context)
         elif callback_data == 'suporte':
-            await self.ajuda(callback_update, context)
+            await self.suporte(callback_update, context)
         elif callback_data == 'contato':
             await self.contato(callback_update, context)
         elif callback_data == 'status':
@@ -687,9 +712,92 @@ Seu acesso será liberado automaticamente!
         else:
             await query.edit_message_text("❌ Opção não reconhecida")
 
+    async def reply_with_buttons(self, update: Update, message: str, reply_markup):
+        """Helper method to reply with buttons for both regular messages and callbacks"""
+        if hasattr(update, 'callback_query') and update.callback_query:
+            await update.callback_query.edit_message_text(
+                message, 
+                parse_mode='Markdown', 
+                reply_markup=reply_markup
+            )
+        else:
+            await update.message.reply_text(
+                message, 
+                parse_mode='Markdown', 
+                reply_markup=reply_markup
+            )
+
+    async def handle_apk_file(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handle APK file uploads"""
+        welcome_message = """
+🔧 **APK RECEBIDO!** 📱
+
+Para análise completa de APKs, você precisa do acesso Premium!
+
+💎 **Com o LiberaNet Premium você pode:**
+• ⚡ Analisar APKs instantaneamente
+• 🔧 Modificar aplicativos
+• 💎 Personalizar interfaces
+• 🔓 Desbloquear recursos
+
+**Adquira seu acesso agora!**
+"""
+        keyboard = [
+            [
+                InlineKeyboardButton("💰 Comprar Premium", callback_data='comprar'),
+                InlineKeyboardButton("💳 Pagar PIX", callback_data='pagar')
+            ],
+            [
+                InlineKeyboardButton("🆓 Demo Grátis", callback_data='demo'),
+                InlineKeyboardButton("🔧 Ver Funcionalidades", callback_data='funcionalidades')
+            ],
+            [
+                InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await update.message.reply_text(welcome_message, parse_mode='Markdown', reply_markup=reply_markup)
+
+    async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handle regular text messages"""
+        sales_message = """
+💰 **LIBERANET PREMIUM** 💎
+
+Vejo que você está interessado!
+
+🚀 **Transforme seu desenvolvimento mobile:**
+• 🔧 Ferramentas profissionais
+• 📱 Modificação avançada de APKs
+• 💎 Dashboard administrativo
+• 🔓 Recursos premium desbloqueados
+
+💸 **Por apenas R$ 25/mês**
+🔥 **Primeira mensalidade: R$ 12,50**
+
+**Use os botões abaixo para começar!**
+"""
+        keyboard = [
+            [
+                InlineKeyboardButton("💰 Comprar Agora", callback_data='comprar'),
+                InlineKeyboardButton("💳 Pagar PIX", callback_data='pagar')
+            ],
+            [
+                InlineKeyboardButton("🆓 Demo Grátis", callback_data='demo'),
+                InlineKeyboardButton("🔧 Ver Funcionalidades", callback_data='funcionalidades')
+            ],
+            [
+                InlineKeyboardButton("💬 Suporte", callback_data='suporte'),
+                InlineKeyboardButton("🏠 Menu Principal", callback_data='start')
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await update.message.reply_text(sales_message, parse_mode='Markdown', reply_markup=reply_markup)
+
     def run(self):
         """Run the bot"""
-        logger.info("🚀 LiberaNet Sales Bot iniciando...")
+        logger.info("🚀 LiberaNet Interactive Sales Bot iniciando...")
         self.app.run_polling()
 
 if __name__ == "__main__":
@@ -697,5 +805,5 @@ if __name__ == "__main__":
     TOKEN = TELEGRAM_BOT_TOKEN
     
     # Create and run bot
-    bot = LiberaNetSalesBot(TOKEN)
+    bot = LiberaNetInteractiveBot(TOKEN)
     bot.run()
