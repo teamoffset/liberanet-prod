@@ -1,0 +1,45 @@
+{
+  "carrier_bypass": {
+    "enabled": true,
+    "detection_methods": [
+      {
+        "method": "extrainfo_spoof",
+        "targets": [
+          "vivo",
+          "tim",
+          "claro",
+          "oi"
+        ],
+        "replacement": "WiFi_Enterprise",
+        "priority": 1
+      },
+      {
+        "method": "network_type_spoof",
+        "targets": [
+          "MOBILE",
+          "mobile"
+        ],
+        "replacement": "WIFI",
+        "priority": 2
+      },
+      {
+        "method": "operator_name_spoof",
+        "targets": [
+          "Vivo",
+          "TIM",
+          "Claro",
+          "Oi"
+        ],
+        "replacement": "WiFi-Direct",
+        "priority": 3
+      }
+    ],
+    "advanced_settings": {
+      "deep_inspection_bypass": true,
+      "fingerprint_randomization": true,
+      "network_capability_masking": true,
+      "dns_masking": true,
+      "user_agent_rotation": true
+    }
+  }
+}

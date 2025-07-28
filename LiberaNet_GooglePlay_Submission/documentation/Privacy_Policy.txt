@@ -1,0 +1,43 @@
+LIBERANET VPN - PRIVACY POLICY
+
+Last updated: July 27, 2025
+
+1. INFORMATION WE COLLECT
+We are committed to protecting your privacy. LiberaNet VPN does not log or store:
+- Your browsing activity
+- Connection timestamps
+- IP addresses
+- DNS queries
+- Traffic data
+
+2. TECHNICAL DATA
+We may collect limited technical information for service optimization:
+- Device type and OS version
+- Connection success/failure rates (anonymized)
+- Performance metrics (anonymized)
+- Crash reports (anonymized)
+
+3. NETWORK OPTIMIZATION
+Our app includes intelligent network optimization features:
+- Automatic carrier detection for optimal configuration
+- Network performance analysis
+- Connection stability improvements
+- Carrier-specific optimizations for Brazilian networks
+
+4. DATA USAGE
+Any technical data collected is used solely for:
+- Service improvement
+- Network optimization
+- Performance enhancement
+- Bug fixes and stability improvements
+
+5. DATA SHARING
+We do not share, sell, or distribute any user data to third parties.
+
+6. SECURITY
+We implement industry-standard security measures to protect any technical data.
+
+7. CONTACT
+For privacy questions, contact us through our official channels.
+
+This privacy policy complies with Brazilian LGPD and international privacy standards.

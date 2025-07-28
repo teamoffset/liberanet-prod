@@ -1,0 +1,85 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Novo Afiliado{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-user-plus me-2"></i>Adicionar Novo Afiliado</h2>
+    <a href="{{ url_for('affiliates') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Voltar
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="name" class="form-label">
+                        <i class="fas fa-user me-2"></i>Nome Completo *
+                    </label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope me-2"></i>Email *
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="commission_rate" class="form-label">
+                        <i class="fas fa-percentage me-2"></i>Taxa de Comissão
+                    </label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="commission_rate" name="commission_rate" 
+                               step="0.01" min="0" max="1" value="0.15">
+                        <span class="input-group-text">% (0.15 = 15%)</span>
+                    </div>
+                    <div class="form-text">Taxa padrão: 15% (0.15)</div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">
+                        <i class="fas fa-info-circle me-2"></i>ID do Afiliado
+                    </label>
+                    <div class="form-control bg-secondary">
+                        <i class="fas fa-magic me-2"></i>Será gerado automaticamente
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="payment_info" class="form-label">
+                    <i class="fas fa-credit-card me-2"></i>Informações de Pagamento
+                </label>
+                <textarea class="form-control" id="payment_info" name="payment_info" rows="3" 
+                          placeholder="PIX, dados bancários ou outras informações para pagamento das comissões"></textarea>
+                <div class="form-text">Essas informações serão usadas para pagar as comissões do afiliado</div>
+            </div>
+            
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Dica:</strong> Após criar o afiliado, ele receberá um ID único que poderá usar nos links 
+                        de divulgação: <code>https://liberanet.com/?ref=ID_AFILIADO</code>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save me-2"></i>Criar Afiliado
+                </button>
+                <a href="{{ url_for('affiliates') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

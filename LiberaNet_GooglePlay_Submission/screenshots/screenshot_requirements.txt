@@ -1,0 +1,31 @@
+GOOGLE PLAY STORE SCREENSHOT REQUIREMENTS
+
+PHONE SCREENSHOTS (Required):
+- Minimum: 2 screenshots
+- Maximum: 8 screenshots
+- Format: PNG or JPG
+- Dimensions: 16:9 or 9:16 aspect ratio
+- Minimum: 320px
+- Maximum: 3840px
+
+TABLET SCREENSHOTS (Optional but recommended):
+- 7-inch and 10-inch tablet screenshots
+- Same format requirements as phone
+
+ANDROID TV SCREENSHOTS (If applicable):
+- TV app screenshots
+- Landscape orientation
+
+RECOMMENDED SCREENSHOTS TO CREATE:
+1. Main app interface showing connection button
+2. Connection status screen
+3. Network optimization features
+4. Settings/configuration screen
+5. About/information screen
+
+SCREENSHOT CONTENT GUIDELINES:
+- Show actual app functionality
+- Use high-quality images
+- Avoid excessive text overlay
+- Demonstrate key features
+- Professional appearance

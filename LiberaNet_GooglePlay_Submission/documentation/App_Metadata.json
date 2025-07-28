@@ -1,0 +1,32 @@
+{
+  "app_name": "LiberaNet VPN",
+  "package_name": "com.liberanet.vpn",
+  "version_name": "1.0.0",
+  "version_code": 1,
+  "category": "Tools",
+  "content_rating": "Everyone",
+  "short_description": "Advanced VPN with intelligent network optimization for Brazilian carriers",
+  "keywords": [
+    "vpn",
+    "network",
+    "optimization",
+    "brazil",
+    "vivo",
+    "tim",
+    "oi",
+    "claro",
+    "connection",
+    "stability",
+    "performance",
+    "security",
+    "privacy"
+  ],
+  "target_audience": "Users seeking enhanced network performance on Brazilian carriers",
+  "key_selling_points": [
+    "Intelligent network optimization",
+    "Brazilian carrier compatibility",
+    "Enhanced connection stability",
+    "Professional VPN technology",
+    "Easy to use interface"
+  ]
+}

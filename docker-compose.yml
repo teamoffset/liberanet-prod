@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  liberanet:
+    build: .
+    ports:
+      - "80:80"
+    environment:
+      - FLASK_ENV=production
+      - PUSHINPAY_USER_ID=40008
+      - PUSHINPAY_API_KEY=JVZWkj9unstgSQtDBIvb8a9q63ZjnmEwSUHZx59Fc89e9856
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

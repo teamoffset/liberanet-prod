@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:tag="layout-land/fragment_config_0" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout android:orientation="vertical" android:padding="@dimen/_5sdp" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <LinearLayout android:gravity="center" android:orientation="horizontal" android:id="@id/configArea" android:tag="binding_1" android:background="@drawable/input_style" android:paddingTop="@dimen/_5sdp" android:paddingBottom="@dimen/_5sdp" android:focusable="true" android:clickable="true" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="@dimen/_5sdp" android:paddingStart="@dimen/_4sdp" android:paddingEnd="@dimen/_4sdp">
+            <ImageView android:id="@id/configIcon" android:tag="binding_2" android:layout_width="@dimen/_10sdp" android:layout_height="@dimen/_10sdp" android:contentDescription="@string/todo" android:layout_marginStart="@dimen/_3sdp" app:srcCompat="@drawable/ic_file" />
+            <TextView android:textSize="@dimen/_6ssp" android:textStyle="bold" android:ellipsize="end" android:id="@id/configName" android:tag="binding_3" android:layout_width="0.0dip" android:layout_height="wrap_content" android:maxLines="1" android:layout_weight="1.0" android:layout_marginStart="@dimen/_5sdp" />
+            <TextView android:textSize="@dimen/_5ssp" android:textStyle="bold" android:ellipsize="end" android:gravity="end" android:id="@id/configMode" android:tag="binding_4" android:layout_width="wrap_content" android:layout_height="wrap_content" android:maxLines="1" android:textAllCaps="true" />
+            <ImageView android:layout_gravity="center" android:id="@id/configIconDrop" android:tag="binding_5" android:layout_width="@dimen/_10sdp" android:layout_height="@dimen/_10sdp" android:rotation="-90.0" android:layout_marginStart="@dimen/_5sdp" android:layout_marginEnd="3.0dip" app:srcCompat="@drawable/ic_down" />
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="@dimen/_5sdp">
+            <LinearLayout android:gravity="center" android:id="@id/usernameArea" android:tag="binding_6" android:background="@drawable/input_style" android:layout_width="0.0dip" android:layout_height="wrap_content" android:layout_weight="1.0" android:paddingStart="@dimen/_3sdp" android:paddingEnd="@dimen/_3sdp" android:layout_marginEnd="@dimen/_5sdp">
+                <ImageView android:layout_gravity="center" android:id="@id/usernameIcon" android:tag="binding_7" android:layout_width="@dimen/_10sdp" android:layout_height="@dimen/_10sdp" android:contentDescription="@string/todo" android:layout_marginStart="@dimen/_3sdp" app:srcCompat="@drawable/ic_person" />
+                <EditText android:textSize="@dimen/_7ssp" android:id="@id/configUsername" android:tag="binding_8" android:background="@drawable/background_transparent" android:padding="@dimen/_5sdp" android:layout_width="fill_parent" android:layout_height="wrap_content" android:lines="0" android:inputType="text" android:layout_marginStart="@dimen/_5sdp" />
+            </LinearLayout>
+            <LinearLayout android:gravity="center" android:id="@id/passwordArea" android:tag="binding_9" android:background="@drawable/input_style" android:layout_width="0.0dip" android:layout_height="wrap_content" android:layout_weight="1.0" android:paddingStart="@dimen/_3sdp" android:paddingEnd="@dimen/_3sdp">
+                <ImageView android:layout_gravity="center" android:id="@id/passwordIcon" android:tag="binding_10" android:layout_width="@dimen/_10sdp" android:layout_height="@dimen/_10sdp" android:contentDescription="@string/todo" android:layout_marginStart="@dimen/_3sdp" app:srcCompat="@drawable/ic_lock" />
+                <EditText android:textSize="@dimen/_7ssp" android:id="@id/configPassword" android:tag="binding_11" android:background="@drawable/background_transparent" android:padding="@dimen/_5sdp" android:layout_width="0.0dip" android:layout_height="wrap_content" android:lines="0" android:layout_weight="1.0" android:inputType="textPassword" android:layout_marginStart="@dimen/_5sdp" android:autofillHints="yes" />
+                <ImageView android:layout_gravity="center" android:id="@id/passwordToggleIcon" android:tag="binding_12" android:padding="@dimen/_1sdp" android:layout_width="@dimen/_10sdp" android:layout_height="@dimen/_10sdp" android:layout_marginEnd="3.0dip" app:srcCompat="@drawable/ic_eye" />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:id="@id/uuidArea" android:tag="binding_13" android:background="@drawable/input_style" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="@dimen/_5sdp" android:paddingStart="@dimen/_3sdp" android:paddingEnd="@dimen/_3sdp">
+            <ImageView android:layout_gravity="center" android:id="@id/uuidIcon" android:tag="binding_14" android:layout_width="@dimen/_10sdp" android:layout_height="@dimen/_10sdp" android:contentDescription="@string/todo" android:layout_marginStart="@dimen/_3sdp" app:srcCompat="@drawable/ic_lock" />
+            <EditText android:textSize="@dimen/_7ssp" android:id="@id/configUUID" android:tag="binding_15" android:background="@drawable/background_transparent" android:padding="@dimen/_5sdp" android:layout_width="0.0dip" android:layout_height="wrap_content" android:lines="1" android:layout_weight="1.0" android:inputType="text" android:layout_marginStart="@dimen/_5sdp" android:autofillHints="yes" />
+            <ImageView android:layout_gravity="center" android:id="@id/uuidToggleIcon" android:tag="binding_16" android:padding="@dimen/_1sdp" android:layout_width="@dimen/_10sdp" android:layout_height="@dimen/_10sdp" android:layout_marginEnd="10.0dip" app:srcCompat="@drawable/ic_eye_slash" />
+        </LinearLayout>
+        <LinearLayout android:gravity="center" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton android:textSize="@dimen/_6ssp" android:textStyle="bold" android:id="@id/btnVpnSetup" android:tag="binding_17" android:background="@drawable/btn_style" android:layout_width="0.0dip" android:layout_height="@dimen/_20sdp" android:layout_weight="1.0" android:elevation="0.0dip" style="?android:borderlessButtonStyle">
+                <requestFocus />
+            </androidx.appcompat.widget.AppCompatButton>
+            <LinearLayout android:gravity="center" android:id="@id/btnUpdateArea" android:tag="binding_18" android:background="@drawable/btn_style" android:focusable="true" android:clickable="true" android:layout_width="@dimen/_20sdp" android:layout_height="@dimen/_20sdp" android:layout_marginStart="@dimen/_3sdp">
+                <ImageView android:layout_gravity="center" android:id="@id/btnUpdateImg" android:tag="binding_19" android:layout_width="@dimen/_10sdp" android:layout_height="@dimen/_18sdp" android:src="@drawable/ic_update" />
+            </LinearLayout>
+            <LinearLayout android:gravity="center" android:id="@id/btnLoggerArea" android:tag="binding_20" android:background="@drawable/btn_style" android:focusable="true" android:clickable="true" android:layout_width="@dimen/_20sdp" android:layout_height="@dimen/_20sdp" android:layout_marginStart="@dimen/_3sdp">
+                <ImageView android:layout_gravity="center" android:id="@id/btnLogger" android:tag="binding_21" android:layout_width="@dimen/_10sdp" android:layout_height="@dimen/_18sdp" android:src="@drawable/ic_logger" />
+            </LinearLayout>
+            <LinearLayout android:gravity="center" android:id="@id/btnPageArea" android:tag="binding_22" android:background="@drawable/btn_style" android:focusable="true" android:clickable="true" android:layout_width="@dimen/_20sdp" android:layout_height="@dimen/_20sdp" android:layout_marginStart="@dimen/_3sdp">
+                <ImageView android:layout_gravity="center" android:id="@id/btnPage" android:tag="binding_23" android:layout_width="@dimen/_10sdp" android:layout_height="@dimen/_18sdp" android:src="@drawable/ic_browser" />
+            </LinearLayout>
+            <LinearLayout android:gravity="center" android:id="@id/btnMenuArea" android:tag="binding_24" android:background="@drawable/btn_style" android:focusable="true" android:clickable="true" android:layout_width="@dimen/_20sdp" android:layout_height="@dimen/_20sdp" android:layout_marginStart="@dimen/_3sdp">
+                <ImageView android:layout_gravity="center" android:id="@id/btnMenu" android:tag="binding_25" android:layout_width="@dimen/_10sdp" android:layout_height="@dimen/_18sdp" android:src="@drawable/ic_menu" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

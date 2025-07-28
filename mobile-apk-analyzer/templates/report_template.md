@@ -1,0 +1,59 @@
+# 🎯 {{APP_NAME}} - RELATÓRIO DE ANÁLISE
+
+**Data da Análise:** {{ANALYSIS_DATE}}  
+**Versão da Suite:** {{SUITE_VERSION}}  
+**Package Name:** {{PACKAGE_NAME}}  
+
+---
+
+## 📊 RESUMO EXECUTIVO
+
+### {{THREAT_LEVEL}} NÍVEL DE AMEAÇA: {{THREAT_RATING}}
+
+{{EXECUTIVE_SUMMARY}}
+
+### 🎯 DESCOBERTAS PRINCIPAIS
+
+#### 1. INFRAESTRUTURA IDENTIFICADA
+{{#FIREBASE_DETECTED}}
+- **Projeto Firebase:** {{FIREBASE_PROJECT}}
+- **API Key:** {{FIREBASE_API_KEY}}
+- **App ID:** {{FIREBASE_APP_ID}}
+- **Storage:** {{FIREBASE_STORAGE}}
+{{/FIREBASE_DETECTED}}
+
+#### 2. PROTOCOLOS IMPLEMENTADOS
+{{PROTOCOLS_LIST}}
+
+#### 3. CAPACIDADES DE TELEMETRIA
+{{TELEMETRY_CAPABILITIES}}
+
+---
+
+## 📁 ESTRUTURA DE ANÁLISE
+
+### 📱 Análise Estática
+{{STATIC_ANALYSIS_RESULTS}}
+
+### 🌐 Análise de Tráfego
+{{TRAFFIC_ANALYSIS_RESULTS}}
+
+### 🔍 Análise Dinâmica
+{{DYNAMIC_ANALYSIS_RESULTS}}
+
+---
+
+## ⚠️ RECOMENDAÇÕES
+
+### 🚫 IMEDIATAS
+{{IMMEDIATE_RECOMMENDATIONS}}
+
+### 🛡️ PREVENTIVAS
+{{PREVENTIVE_RECOMMENDATIONS}}
+
+### 🔍 INVESTIGATIVAS
+{{INVESTIGATIVE_RECOMMENDATIONS}}
+
+---
+
+*Relatório gerado automaticamente pelo Mobile APK Analyzer*

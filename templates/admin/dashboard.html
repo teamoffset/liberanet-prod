@@ -1,0 +1,209 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h2>
+    <div class="text-muted">
+        <i class="fas fa-calendar me-1"></i>{{ current_datetime }}
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                <h3>{{ stats.total_sales }}</h3>
+                <p class="mb-0">Vendas Realizadas</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                <h3>R$ {{ "%.2f"|format(stats.total_revenue) }}</h3>
+                <p class="mb-0">Receita Total</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <i class="fas fa-users fa-2x mb-2"></i>
+                <h3>{{ stats.total_affiliates }}</h3>
+                <p class="mb-0">Afiliados Ativos</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <i class="fas fa-key fa-2x mb-2"></i>
+                <h3>{{ stats.total_credentials }}</h3>
+                <p class="mb-0">Credenciais VPN</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Sales -->
+    <div class="col-md-8 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-chart-line me-2"></i>Vendas Recentes</h5>
+                <a href="{{ url_for('sales') }}" class="btn btn-outline-primary btn-sm">Ver Todas</a>
+            </div>
+            <div class="card-body">
+                {% if recent_sales %}
+                    <div class="table-responsive">
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Plano</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sale in recent_sales %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ sale.customer_name or 'N/A' }}</strong><br>
+                                            <small class="text-muted">{{ sale.customer_email }}</small>
+                                        </div>
+                                    </td>
+                                    <td>{{ sale.plan_name }}</td>
+                                    <td>R$ {{ "%.2f"|format(sale.amount) }}</td>
+                                    <td>
+                                        {% if sale.payment_status == 'completed' %}
+                                            <span class="badge bg-success">Pago</span>
+                                        {% elif sale.payment_status == 'pending' %}
+                                            <span class="badge bg-warning">Pendente</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Cancelado</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ sale.created_at[:16] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-chart-line fa-3x mb-3"></i>
+                        <p>Nenhuma venda realizada ainda</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Affiliates -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-trophy me-2"></i>Top Afiliados</h5>
+                <a href="{{ url_for('affiliates') }}" class="btn btn-outline-primary btn-sm">Ver Todos</a>
+            </div>
+            <div class="card-body">
+                {% if top_affiliates %}
+                    {% for affiliate in top_affiliates %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <strong>{{ affiliate.name }}</strong><br>
+                            <small class="text-muted">{{ affiliate.email }}</small>
+                        </div>
+                        <div class="text-end">
+                            <strong class="text-success">R$ {{ "%.2f"|format(affiliate.total_commission) }}</strong><br>
+                            <small class="text-muted">{{ affiliate.total_sales }} vendas</small>
+                        </div>
+                    </div>
+                    {% if not loop.last %}<hr>{% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-users fa-3x mb-3"></i>
+                        <p>Nenhum afiliado cadastrado ainda</p>
+                        <a href="{{ url_for('add_affiliate') }}" class="btn btn-primary">Adicionar Afiliado</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt me-2"></i>Ações Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('add_affiliate') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-user-plus me-2"></i>Novo Afiliado
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('add_credential') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-key me-2"></i>Nova Credencial
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('settings') }}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-cog me-2"></i>Configurações
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button onclick="testPushinPay()" class="btn btn-outline-info w-100">
+                            <i class="fas fa-credit-card me-2"></i>Testar PushinPay
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function testPushinPay() {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Testando...';
+    btn.disabled = true;
+    
+    fetch('{{ url_for("test_pushinpay") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('✅ PushinPay funcionando corretamente!');
+            } else {
+                alert('❌ Erro: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('❌ Erro na conexão: ' + error);
+        })
+        .finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+}
+</script>
+{% endblock %}

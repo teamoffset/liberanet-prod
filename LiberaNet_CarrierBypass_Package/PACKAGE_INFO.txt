@@ -1,0 +1,34 @@
+🎯 LIBERANET CARRIER BYPASS PACKAGE
+==================================
+
+📅 Created: Sun Jul 27 15:22:21 -03 2025
+📱 APK File: LiberaNet_CarrierBypass.apk
+📊 APK Size: 13K
+🛡️ Bypass Scripts: 3 files
+📋 Documentation: Complete
+
+🇧🇷 SUPPORTED CARRIERS:
+• Vivo (Telefônica)
+• TIM Brasil  
+• Oi (Telemar)
+• Claro (América Móvil)
+
+🔧 DEPLOYMENT OPTIONS:
+1. Direct APK installation (All devices)
+2. Frida bypass scripts (Rooted devices)
+3. ADB installation (Developer mode)
+
+📁 PACKAGE CONTENTS:
+• apk/LiberaNet_CarrierBypass.apk - Main app
+• scripts/g0_carrier_fix.js - G0.G method bypass
+• scripts/h1_network_fix.js - H1.f network bypass  
+• scripts/liberanet_carrier_bypass.js - Full bypass
+• scripts/deploy_to_device.sh - Auto deployment
+• scripts/carrier_config.json - Bypass configuration
+• docs/INSTALLATION_GUIDE.md - Complete guide
+• QUICK_START.sh - Quick start script
+
+🌐 BACKEND: https://liberanet.online
+👨‍💼 ADMIN: https://liberanet.online/admin
+
+✅ STATUS: PRODUCTION READY

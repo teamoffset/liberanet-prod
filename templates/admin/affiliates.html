@@ -1,0 +1,134 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Afiliados{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-users me-2"></i>Gerenciar Afiliados</h2>
+    <a href="{{ url_for('add_affiliate') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Novo Afiliado
+    </a>
+</div>
+
+{% if affiliates %}
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>ID Afiliado</th>
+                        <th>Comissão</th>
+                        <th>Vendas</th>
+                        <th>Total Comissão</th>
+                        <th>Status</th>
+                        <th>Cadastro</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for affiliate in affiliates %}
+                    <tr>
+                        <td>
+                            <strong>{{ affiliate.name }}</strong>
+                        </td>
+                        <td>{{ affiliate.email }}</td>
+                        <td>
+                            <code class="text-info">{{ affiliate.affiliate_id }}</code>
+                        </td>
+                        <td>{{ (affiliate.commission_rate * 100)|round(1) }}%</td>
+                        <td>{{ affiliate.total_sales }}</td>
+                        <td>R$ {{ "%.2f"|format(affiliate.total_commission) }}</td>
+                        <td>
+                            {% if affiliate.is_active %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ affiliate.created_at[:10] }}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-info" onclick="viewAffiliate({{ affiliate.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-warning" onclick="editAffiliate({{ affiliate.id }})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="toggleAffiliate({{ affiliate.id }}, {{ affiliate.is_active|lower }})">
+                                    <i class="fas fa-{{ 'ban' if affiliate.is_active else 'check' }}"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-users fa-4x text-muted mb-4"></i>
+        <h4>Nenhum afiliado cadastrado</h4>
+        <p class="text-muted mb-4">Comece adicionando seu primeiro afiliado para aumentar suas vendas!</p>
+        <a href="{{ url_for('add_affiliate') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Adicionar Primeiro Afiliado
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal para visualizar afiliado -->
+<div class="modal fade" id="viewAffiliateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-user me-2"></i>Detalhes do Afiliado</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="affiliateDetails">
+                <!-- Conteúdo carregado via JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function viewAffiliate(id) {
+    // Por enquanto, um exemplo simples
+    const modal = new bootstrap.Modal(document.getElementById('viewAffiliateModal'));
+    document.getElementById('affiliateDetails').innerHTML = `
+        <div class="text-center">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <p class="mt-2">Carregando detalhes...</p>
+        </div>
+    `;
+    modal.show();
+    
+    // Aqui você implementaria uma chamada AJAX para buscar os detalhes
+    setTimeout(() => {
+        document.getElementById('affiliateDetails').innerHTML = `
+            <p><i class="fas fa-info-circle text-info me-2"></i>Funcionalidade em desenvolvimento</p>
+            <p class="text-muted">Em breve você poderá visualizar estatísticas detalhadas do afiliado.</p>
+        `;
+    }, 1000);
+}
+
+function editAffiliate(id) {
+    alert('Funcionalidade de edição em desenvolvimento!');
+}
+
+function toggleAffiliate(id, isActive) {
+    const action = isActive ? 'desativar' : 'ativar';
+    if (confirm(`Tem certeza que deseja ${action} este afiliado?`)) {
+        alert('Funcionalidade em desenvolvimento!');
+    }
+}
+</script>
+{% endblock %}

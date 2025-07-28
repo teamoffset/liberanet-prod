@@ -1,0 +1,32 @@
+{
+  "timestamp": "2025-07-27T15:39:08.431289",
+  "apk_tests": {
+    "file_exists": true,
+    "file_size": 13038,
+    "aapt_analysis": true
+  },
+  "backend_tests": {
+    "local_server": false,
+    "production_server": false
+  },
+  "credential_tests": {
+    "admin_login_local": false,
+    "api__api_status": false,
+    "api__api_user_register": false,
+    "api__api_vpn_connect": false
+  },
+  "network_tests": {
+    "database_exists": true,
+    "database_accessible": true,
+    "config.py_exists": true,
+    "bot_config.env_exists": true,
+    "g0_carrier_fix.js_exists": true,
+    "g0_carrier_fix.js_valid": true,
+    "h1_network_fix.js_exists": true,
+    "h1_network_fix.js_valid": true,
+    "liberanet_carrier_bypass.js_exists": true,
+    "liberanet_carrier_bypass.js_valid": true,
+    "carrier_config_valid": false
+  },
+  "overall_status": "NEEDS_MINOR_FIXES"
+}

@@ -1,0 +1,129 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Configurações{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-cog me-2"></i>Configurações do Sistema</h2>
+</div>
+
+<form method="POST" action="{{ url_for('update_settings') }}">
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-credit-card me-2"></i>PushinPay</h5>
+                </div>
+                <div class="card-body">
+                    {% for setting in settings %}
+                        {% if setting.key.startswith('pushinpay_') %}
+                        <div class="mb-3">
+                            <label for="{{ setting.key }}" class="form-label">
+                                {{ setting.description }}
+                            </label>
+                            {% if 'key' in setting.key %}
+                                <input type="password" class="form-control" id="{{ setting.key }}" 
+                                       name="{{ setting.key }}" value="{{ setting.value }}">
+                            {% else %}
+                                <input type="text" class="form-control" id="{{ setting.key }}" 
+                                       name="{{ setting.key }}" value="{{ setting.value }}">
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-dollar-sign me-2"></i>Preços e Comissões</h5>
+                </div>
+                <div class="card-body">
+                    {% for setting in settings %}
+                        {% if setting.key in ['plan_price', 'default_commission'] %}
+                        <div class="mb-3">
+                            <label for="{{ setting.key }}" class="form-label">
+                                {{ setting.description }}
+                            </label>
+                            <div class="input-group">
+                                {% if setting.key == 'plan_price' %}
+                                    <span class="input-group-text">R$</span>
+                                {% elif setting.key == 'default_commission' %}
+                                    <span class="input-group-text">%</span>
+                                {% endif %}
+                                <input type="number" class="form-control" id="{{ setting.key }}" 
+                                       name="{{ setting.key }}" value="{{ setting.value }}" step="0.01">
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-info-circle me-2"></i>Informações do Site</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for setting in settings %}
+                            {% if setting.key in ['site_title', 'contact_email', 'telegram_support'] %}
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ setting.key }}" class="form-label">
+                                    {{ setting.description }}
+                                </label>
+                                <input type="text" class="form-control" id="{{ setting.key }}" 
+                                       name="{{ setting.key }}" value="{{ setting.value }}">
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success">
+            <i class="fas fa-save me-2"></i>Salvar Configurações
+        </button>
+        <button type="button" class="btn btn-info" onclick="testPushinPay()">
+            <i class="fas fa-credit-card me-2"></i>Testar PushinPay
+        </button>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function testPushinPay() {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Testando...';
+    btn.disabled = true;
+    
+    fetch('/admin/api/pushinpay/test')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('✅ PushinPay funcionando corretamente!');
+            } else {
+                alert('❌ Erro: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('❌ Erro na conexão: ' + error);
+        })
+        .finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+}
+</script>
+{% endblock %}

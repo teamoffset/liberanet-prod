@@ -1,0 +1,34 @@
+{
+  "carriers": {
+    "vivo": {
+      "patterns": ["vivo", "telefonica", "vivo.com.br"],
+      "bypass_method": "wifi_spoofing",
+      "apn_override": "zap.vivo.com.br",
+      "status": "active"
+    },
+    "tim": {
+      "patterns": ["tim", "tim.br", "tim.com.br"],
+      "bypass_method": "network_masking", 
+      "apn_override": "tim.br",
+      "status": "active"
+    },
+    "oi": {
+      "patterns": ["oi", "oi.com.br", "telemar"],
+      "bypass_method": "carrier_hiding",
+      "apn_override": "gprs.oi.com.br", 
+      "status": "active"
+    },
+    "claro": {
+      "patterns": ["claro", "claro.com.br", "america_movil"],
+      "bypass_method": "connection_routing",
+      "apn_override": "claro.com.br",
+      "status": "active"
+    }
+  },
+  "bypass_settings": {
+    "auto_detect": true,
+    "fallback_method": "generic_wifi",
+    "logging_enabled": true,
+    "stealth_mode": true
+  }
+}

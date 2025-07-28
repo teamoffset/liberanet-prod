@@ -1,0 +1,32 @@
+# Output directories
+output/
+logs/
+temp/
+*_ANALYSIS_*/
+*_TRAFFIC_*/
+*_FRIDA_*/
+
+# Temporary files
+*.tmp
+*.log
+debug.log
+
+# Analysis results
+*.pcap
+intercepts.jsonl
+frida_interceptation.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Sensitive data
+config/local.conf
+*.key
+*.pem

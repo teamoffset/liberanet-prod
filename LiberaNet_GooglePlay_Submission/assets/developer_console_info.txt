@@ -1,0 +1,39 @@
+GOOGLE PLAY DEVELOPER CONSOLE INFORMATION
+
+APP DETAILS:
+- App Name: LiberaNet VPN
+- Package Name: com.liberanet.vpn  
+- Category: Tools
+- Content Rating: Everyone
+- Price: Free
+
+STORE LISTING:
+- Short Description: Advanced VPN with intelligent network optimization for Brazilian carriers
+- Keywords: vpn, network, optimization, brazil, vivo, tim, oi, claro, connection, stability
+- Website: https://liberanet.online
+- Support Email: [Your support email]
+- Privacy Policy URL: [Your privacy policy URL]
+
+CONTENT RATING:
+- Violence: None
+- Sexual Content: None  
+- Profanity: None
+- Controlled Substances: None
+- Gambling: None
+- Suitable for: Everyone
+
+TARGET AUDIENCE:
+- Primary: Users seeking enhanced network performance
+- Geographic: Brazil (but available globally)
+- Age Range: 13+
+
+PERMISSIONS JUSTIFICATION:
+- INTERNET: Required for VPN connectivity
+- ACCESS_NETWORK_STATE: For network optimization features
+- ACCESS_WIFI_STATE: For connection management
+- READ_PHONE_STATE: Optional, for carrier-specific optimizations
+
+APP SIGNING:
+- Use Google Play App Signing
+- Upload signed APK/AAB
+- Enable Google Play App Signing for enhanced security

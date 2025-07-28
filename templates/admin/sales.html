@@ -1,0 +1,88 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Vendas{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-chart-line me-2"></i>Relatório de Vendas</h2>
+    <div>
+        <button class="btn btn-outline-success" onclick="exportSales()">
+            <i class="fas fa-download me-2"></i>Exportar
+        </button>
+    </div>
+</div>
+
+{% if sales %}
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Cliente</th>
+                        <th>Plano</th>
+                        <th>Valor</th>
+                        <th>Afiliado</th>
+                        <th>Comissão</th>
+                        <th>Status</th>
+                        <th>ID Pagamento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales %}
+                    <tr>
+                        <td>{{ sale.created_at[:16] }}</td>
+                        <td>
+                            <div>
+                                <strong>{{ sale.customer_name or 'N/A' }}</strong><br>
+                                <small class="text-muted">{{ sale.customer_email }}</small>
+                            </div>
+                        </td>
+                        <td>{{ sale.plan_name }}</td>
+                        <td>R$ {{ "%.2f"|format(sale.amount) }}</td>
+                        <td>
+                            {% if sale.affiliate_name %}
+                                <span class="badge bg-info">{{ sale.affiliate_name }}</span>
+                            {% else %}
+                                <span class="text-muted">Direto</span>
+                            {% endif %}
+                        </td>
+                        <td>R$ {{ "%.2f"|format(sale.commission) }}</td>
+                        <td>
+                            {% if sale.payment_status == 'completed' %}
+                                <span class="badge bg-success">Pago</span>
+                            {% elif sale.payment_status == 'pending' %}
+                                <span class="badge bg-warning">Pendente</span>
+                            {% else %}
+                                <span class="badge bg-danger">Cancelado</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <code class="text-info">{{ sale.payment_id or 'N/A' }}</code>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-chart-line fa-4x text-muted mb-4"></i>
+        <h4>Nenhuma venda realizada</h4>
+        <p class="text-muted">As vendas aparecerão aqui quando clientes comprarem o VPN.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function exportSales() {
+    alert('Funcionalidade de exportação em desenvolvimento!');
+}
+</script>
+{% endblock %}

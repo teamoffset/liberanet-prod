@@ -1,0 +1,12 @@
+/home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/src/main/java/com/mobileapk/analyzer/utils/SystemUtils.java
+/home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/src/main/java/com/mobileapk/analyzer/utils/ColorUtils.java
+/home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/src/main/java/com/mobileapk/analyzer/model/StaticAnalysisResult.java
+/home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/src/main/java/com/mobileapk/analyzer/model/AnalysisResult.java
+/home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/src/main/java/com/mobileapk/analyzer/core/ReportGenerator.java
+/home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/src/main/java/com/mobileapk/analyzer/core/DynamicAnalyzer.java
+/home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/src/main/java/com/mobileapk/analyzer/model/TrafficAnalysisResult.java
+/home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/src/main/java/com/mobileapk/analyzer/model/AnalysisConfig.java
+/home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/src/main/java/com/mobileapk/analyzer/core/TrafficAnalyzer.java
+/home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/src/main/java/com/mobileapk/analyzer/core/ApkAnalyzer.java
+/home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/src/main/java/com/mobileapk/analyzer/model/DynamicAnalysisResult.java
+/home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/src/main/java/com/mobileapk/analyzer/MobileApkAnalyzer.java

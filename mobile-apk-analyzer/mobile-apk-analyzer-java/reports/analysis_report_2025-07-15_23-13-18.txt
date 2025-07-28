@@ -1,0 +1,47 @@
+╔══════════════════════════════════════════════╗
+║          🔒 MOBILE APK ANALYZER 🔒           ║
+║              Analysis Report                 ║
+╚══════════════════════════════════════════════╝
+
+📱 APK Information:
+   File: connex_pro.apk
+   Size: 7.8 MB
+   Path: /home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/connex_pro.apk
+   Analysis Time: 2025-07-15_23-13-18
+
+� Application Details:
+   Package: com.devws.pro
+   App Name: Connex Pro
+   Version: 4.4.6 (18)
+   Target SDK: 35
+   Min SDK: 25
+
+🛡️ Permissions (19 total):
+   - android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+   - android.permission.INTERNET
+   - android.permission.ACCESS_NETWORK_STATE
+   - android.permission.ACCESS_WIFI_STATE
+   - android.permission.CHANGE_NETWORK_STATE
+   - android.permission.FOREGROUND_SERVICE
+   - android.permission.FOREGROUND_SERVICE_SPECIAL_USE
+   - android.permission.RECEIVE_BOOT_COMPLETED
+   - android.permission.POST_NOTIFICATIONS
+   - android.permission.WAKE_LOCK
+   - android.permission.ACCESS_FINE_LOCATION
+   - android.permission.ACCESS_COARSE_LOCATION
+   - com.google.android.c2dm.permission.RECEIVE
+   - com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE
+   - com.google.android.gms.permission.AD_ID
+   - android.permission.ACCESS_ADSERVICES_ATTRIBUTION
+   - android.permission.ACCESS_ADSERVICES_AD_ID
+   - com.devws.pro.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+   - com.android.vending.CHECK_LICENSE
+
+⚠️ Security Issues Found:
+   ❌ Dangerous permission detected: android.permission.ACCESS_FINE_LOCATION
+   ❌ Dangerous permission detected: android.permission.ACCESS_COARSE_LOCATION
+
+📊 Analysis Summary:
+   Status: ✅ Analysis completed successfully
+   Issues Found: 2 warnings
+   Recommendations: Review permissions and security practices

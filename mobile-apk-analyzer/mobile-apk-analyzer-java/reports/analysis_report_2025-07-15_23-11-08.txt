@@ -1,0 +1,18 @@
+╔══════════════════════════════════════════════╗
+║          🔒 MOBILE APK ANALYZER 🔒           ║
+║              Analysis Report                 ║
+╚══════════════════════════════════════════════╝
+
+📱 APK Information:
+   File: test.apk
+   Size: 17 B
+   Path: /home/ggf/liberanet/mobile-apk-analyzer/mobile-apk-analyzer-java/test.apk
+   Analysis Time: 2025-07-15_23-11-08
+
+⚠️ Security Issues Found:
+   ❌ Analysis failed: zip END header not found
+
+📊 Analysis Summary:
+   Status: ✅ Analysis completed successfully
+   Issues Found: 1 warnings
+   Recommendations: Review permissions and security practices
