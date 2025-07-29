@@ -26,10 +26,13 @@ class APKCompiler:
         self.output_dir = self.project_dir / "output"
         
         # Android SDK tools paths
-        self.aapt = shutil.which('aapt2') or shutil.which('aapt')
-        self.dx = shutil.which('d8') or shutil.which('dx')
-        self.zipalign = shutil.which('zipalign')
-        self.apksigner = shutil.which('apksigner')
+        android_sdk_path = self.project_dir / "android-sdk-tools"
+        build_tools_path = android_sdk_path / "build-tools/30.0.3"
+        
+        self.aapt = str(build_tools_path / "aapt2") if (build_tools_path / "aapt2").exists() else str(build_tools_path / "aapt")
+        self.dx = str(build_tools_path / "d8") if (build_tools_path / "d8").exists() else shutil.which('dx')
+        self.zipalign = str(build_tools_path / "zipalign") if (build_tools_path / "zipalign").exists() else shutil.which('zipalign')
+        self.apksigner = str(build_tools_path / "apksigner") if (build_tools_path / "apksigner").exists() else shutil.which('apksigner')
         self.javac = shutil.which('javac')
         
         # Create directories
@@ -38,9 +41,17 @@ class APKCompiler:
         
         logger.info(f"🚀 APKCompiler initialized in {self.project_dir}")
         
-    def setup_project_structure(self, app_name="LiberaNetApp"):
+    def setup_project_structure(self, app_name="LiberaNetApp", project_root=None):
         """Setup Android project structure"""
         logger.info("📁 Setting up Android project structure...")
+        
+        # Use custom project root if provided
+        if project_root:
+            self.project_dir = Path(project_root)
+            self.build_dir = self.project_dir / "build"
+            self.output_dir = self.project_dir / "output"
+            self.build_dir.mkdir(exist_ok=True)
+            self.output_dir.mkdir(exist_ok=True)
         
         # Create standard Android project structure
         dirs = [
@@ -64,19 +75,29 @@ class APKCompiler:
     android:versionName="1.0">
     
     <uses-sdk
-        android:minSdkVersion="21"
-        android:targetSdkVersion="33" />
+        android:minSdkVersion="14"
+        android:targetSdkVersion="34" />
     
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     
+    <!-- Suporte a todas as telas e densidades -->
+    <supports-screens
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true"
+        android:anyDensity="true" />
+    
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="{app_name}"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:hardwareAccelerated="false"
+        android:largeHeap="false">
         
         <activity
             android:name=".MainActivity"
@@ -100,50 +121,118 @@ class APKCompiler:
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.graphics.Color;
 import android.view.Gravity;
+import android.view.View;
+import android.widget.Toast;
+import android.content.Intent;
+import android.net.Uri;
 
 public class MainActivity extends Activity {
+    private Button connectButton;
+    private Button websiteButton;
+    private TextView statusText;
+    private boolean isConnected = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // Create layout programmatically
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setGravity(Gravity.CENTER);
-        layout.setBackgroundColor(Color.parseColor("#1a1a1a"));
+        // Create layout programmatically for maximum compatibility
+        LinearLayout mainLayout = new LinearLayout(this);
+        mainLayout.setOrientation(LinearLayout.VERTICAL);
+        mainLayout.setGravity(Gravity.CENTER);
+        mainLayout.setBackgroundColor(Color.WHITE);
+        mainLayout.setPadding(32, 32, 32, 32);
         
         // Title
         TextView title = new TextView(this);
-        title.setText("🚀 LiberaNet Mobile");
-        title.setTextSize(24);
-        title.setTextColor(Color.parseColor("#00ff88"));
+        title.setText("LiberaNet VPN Universal");
+        title.setTextSize(22);
+        title.setTextColor(Color.parseColor("#2E7D32"));
         title.setPadding(20, 40, 20, 20);
         title.setGravity(Gravity.CENTER);
         
-        // Description
-        TextView desc = new TextView(this);
-        desc.setText("💎 Professional Mobile Platform\\n🔧 Advanced Development Tools\\n📱 APK Modification Suite");
-        desc.setTextSize(16);
-        desc.setTextColor(Color.WHITE);
-        desc.setPadding(20, 20, 20, 40);
-        desc.setGravity(Gravity.CENTER);
+        // Status text
+        statusText = new TextView(this);
+        statusText.setText("Status: Desconectado");
+        statusText.setTextSize(16);
+        statusText.setTextColor(Color.parseColor("#333333"));
+        statusText.setPadding(20, 20, 20, 20);
+        statusText.setGravity(Gravity.CENTER);
         
-        // Version info
-        TextView version = new TextView(this);
-        version.setText("Version 1.0 - Premium Edition");
-        version.setTextSize(12);
-        version.setTextColor(Color.parseColor("#888888"));
-        version.setPadding(20, 20, 20, 20);
-        version.setGravity(Gravity.CENTER);
+        // Connect button
+        connectButton = new Button(this);
+        connectButton.setText("Conectar VPN");
+        connectButton.setTextSize(14);
+        connectButton.setTextColor(Color.WHITE);
+        connectButton.setBackgroundColor(Color.parseColor("#4CAF50"));
+        connectButton.setPadding(40, 20, 40, 20);
+        connectButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                toggleConnection();
+            }
+        });
         
-        layout.addView(title);
-        layout.addView(desc);
-        layout.addView(version);
+        // Website button
+        websiteButton = new Button(this);
+        websiteButton.setText("Abrir Site");
+        websiteButton.setTextSize(12);
+        websiteButton.setTextColor(Color.WHITE);
+        websiteButton.setBackgroundColor(Color.parseColor("#2196F3"));
+        websiteButton.setPadding(40, 15, 40, 15);
+        websiteButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                openWebsite();
+            }
+        });
         
-        setContentView(layout);
+        // Footer text
+        TextView footer = new TextView(this);
+        footer.setText("Compatível com todos os Android!\\nVersão Universal");
+        footer.setTextSize(10);
+        footer.setTextColor(Color.parseColor("#666666"));
+        footer.setPadding(20, 30, 20, 20);
+        footer.setGravity(Gravity.CENTER);
+        
+        // Add views to layout
+        mainLayout.addView(title);
+        mainLayout.addView(statusText);
+        mainLayout.addView(connectButton);
+        mainLayout.addView(websiteButton);
+        mainLayout.addView(footer);
+        
+        setContentView(mainLayout);
+    }
+    
+    private void toggleConnection() {
+        isConnected = !isConnected;
+        updateStatus();
+        
+        String message = isConnected ? "LiberaNet VPN Conectado!" : "LiberaNet VPN Desconectado";
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+    
+    private void updateStatus() {
+        if (isConnected) {
+            statusText.setText("Status: Conectado");
+            connectButton.setText("Desconectar");
+        } else {
+            statusText.setText("Status: Desconectado");
+            connectButton.setText("Conectar VPN");
+        }
+    }
+    
+    private void openWebsite() {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("http://186.190.218.164"));
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "Erro ao abrir site", Toast.LENGTH_SHORT).show();
+        }
     }
 }'''
         
@@ -194,10 +283,13 @@ public class MainActivity extends Activity {
         classes_dir.mkdir(exist_ok=True)
         
         # Compile Java files
-        android_jar = self.project_dir / "android-platform/android.jar"
+        android_jar = self.project_dir / "android-sdk-tools/platforms/android-30/android.jar"
         if not android_jar.exists():
-            logger.error("❌ Android platform JAR not found!")
-            return False
+            # Try fallback path
+            android_jar = self.project_dir / "android-platform/android.jar"
+            if not android_jar.exists():
+                logger.error("❌ Android platform JAR not found!")
+                return False
             
         cmd = [
             self.javac,
@@ -247,6 +339,8 @@ public class MainActivity extends Activity {
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
             if result.returncode != 0:
                 logger.error(f"❌ DEX creation failed: {result.stderr}")
+                logger.error(f"❌ DEX command: {' '.join(cmd)}")
+                logger.error(f"❌ DEX stdout: {result.stdout}")
                 return False
             logger.info("✅ DEX files created successfully!")
             return True
@@ -255,6 +349,7 @@ public class MainActivity extends Activity {
             return False
         except Exception as e:
             logger.error(f"❌ DEX creation error: {e}")
+            logger.error(f"❌ DEX command: {' '.join(cmd)}")
             return False
             
     def compile_resources(self):
@@ -263,7 +358,10 @@ public class MainActivity extends Activity {
         
         manifest_path = self.project_dir / "src/main/AndroidManifest.xml"
         res_dir = self.project_dir / "src/main/res"
-        android_jar = self.project_dir / "android-platform/android.jar"
+        android_jar = self.project_dir / "android-sdk-tools/platforms/android-30/android.jar"
+        
+        if not android_jar.exists():
+            android_jar = self.project_dir / "android-platform/android.jar"
         
         if not manifest_path.exists():
             logger.error("❌ AndroidManifest.xml not found!")
@@ -317,7 +415,10 @@ public class MainActivity extends Activity {
         res_dir = self.project_dir / "src/main/res"
         assets_dir = self.project_dir / "assets"
         dex_file = self.build_dir / "classes.dex"
-        android_jar = self.project_dir / "android-platform/android.jar"
+        android_jar = self.project_dir / "android-sdk-tools/platforms/android-30/android.jar"
+        
+        if not android_jar.exists():
+            android_jar = self.project_dir / "android-platform/android.jar"
         
         # Build APK with aapt
         cmd = [
@@ -407,13 +508,13 @@ public class MainActivity extends Activity {
             logger.error(f"❌ APK signing error: {e}")
             return False
             
-    def full_build(self, app_name="LiberaNetApp", output_name="liberanet_app.apk"):
+    def full_build(self, app_name="LiberaNetApp", output_name="liberanet_app.apk", project_root=None):
         """Perform a complete APK build"""
         logger.info("🚀 Starting full APK build...")
         
         try:
             # Setup project structure
-            self.setup_project_structure(app_name)
+            self.setup_project_structure(app_name, project_root)
             
             # Compile Java sources
             if not self.compile_java_sources():
@@ -451,17 +552,21 @@ def main():
     print("🚀 LiberaNet APK Compiler")
     print("=" * 50)
     
+    # Create project in LiberaNetAndroidProject folder
+    project_root = Path.cwd() / "LiberaNetAndroidProject"
     compiler = APKCompiler()
     
     # Build APK
     success = compiler.full_build(
-        app_name="LiberaNet Mobile",
-        output_name=f"liberanet_mobile_{datetime.now().strftime('%Y%m%d_%H%M%S')}.apk"
+        app_name="LiberaNet Universal",
+        output_name=f"LiberaNet_Universal_{datetime.now().strftime('%Y%m%d_%H%M%S')}.apk",
+        project_root=str(project_root)
     )
     
     if success:
         print("\n✅ BUILD SUCCESSFUL!")
         print(f"📱 APK created in: {compiler.output_dir}")
+        print(f"📁 Project structure: {compiler.project_dir}")
     else:
         print("\n❌ BUILD FAILED!")
         sys.exit(1)

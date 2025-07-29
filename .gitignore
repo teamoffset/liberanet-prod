@@ -8,6 +8,23 @@ build/
 develop-eggs/
 dist/
 downloads/
+
+# Android build artifacts
+output/
+*.apk
+*.apk.idsig
+*.keystore
+android-sdk-tools/
+android-sdk/
+android-platform/
+build_new/
+build_universal/
+
+# Sensitive files
+*.pem
+*.env
+liberanet-production.keystore
+liberanet-release.keystore
 eggs/
 .eggs/
 lib/
